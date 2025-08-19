@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧮 Math Hero - Game Học Phân Số Siêu Hấp Dẫn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap');
+        
+        * {
+            font-family: 'Nunito', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            animation: gradientShift 10s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); }
+            50% { background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%); }
+        }
+        
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 8px;
+            position: relative;
+        }
+        
+        .numerator {
+            border-bottom: 3px solid #374151;
+            padding: 8px 12px;
+            min-width: 50px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.2em;
+            background: white;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .denominator {
+            padding: 8px 12px;
+            min-width: 50px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.2em;
+            background: white;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .answer-input {
+            width: 70px;
+            height: 45px;
+            text-align: center;
+            border: 3px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .answer-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+            outline: none;
+            transform: scale(1.05);
+        }
+        
+        .bounce-in {
+            animation: bounceIn 0.8s ease-out;
+        }
+        
+        .shake {
+            animation: shake 0.6s ease-in-out;
+        }
+        
+        .pulse-success {
+            animation: pulseSuccess 1s ease-in-out;
+        }
+        
+        .star-rain {
+            animation: starRain 2s ease-out;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.1) rotate(5deg); }
+            70% { transform: scale(0.9) rotate(-2deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+            20%, 40%, 60%, 80% { transform: translateX(8px); }
+        }
+        
+        @keyframes pulseSuccess {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); box-shadow: 0 0 30px rgba(34, 197, 94, 0.5); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes starRain {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(100px) rotate(360deg); opacity: 0; }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .progress-bar {
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .streak-glow {
+            animation: streakGlow 1.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes streakGlow {
+            0% { box-shadow: 0 0 5px rgba(251, 191, 36, 0.5); }
+            100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.8), 0 0 30px rgba(251, 191, 36, 0.4); }
+        }
+        
+        .modal-backdrop {
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .sortable-item {
+            cursor: grab;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        
+        .sortable-item:hover {
+            transform: scale(1.05) rotate(2deg);
+        }
+        
+        .sortable-item.dragging {
+            opacity: 0.7;
+            transform: rotate(10deg) scale(1.1);
+            z-index: 1000;
+        }
+        
+        .drop-zone {
+            transition: all 0.3s ease;
+        }
+        
+        .drop-zone.drag-over {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+            transform: scale(1.02);
+        }
+        
+        .virtual-keyboard {
+            background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+            border-radius: 20px;
+            box-shadow: inset 5px 5px 10px #d1d5db, inset -5px -5px 10px #ffffff;
+        }
+        
+        .key-button {
+            background: linear-gradient(145deg, #ffffff, #f1f5f9);
+            box-shadow: 3px 3px 6px #d1d5db, -3px -3px 6px #ffffff;
+            transition: all 0.2s ease;
+        }
+        
+        .key-button:active {
+            box-shadow: inset 2px 2px 4px #d1d5db, inset -2px -2px 4px #ffffff;
+            transform: scale(0.95);
+        }
+        
+        .achievement-badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            animation: badgeShine 2s ease-in-out infinite;
+        }
+        
+        @keyframes badgeShine {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), 0 0 35px rgba(255, 215, 0, 0.4); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen overflow-x-hidden">
+    <!-- Header -->
+    <header class="bg-white/20 backdrop-blur-md border-b border-white/30 sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-4xl floating">🧮</div>
+                    <div>
+                        <h1 class="text-2xl font-black text-white">Math Hero</h1>
+                        <p class="text-white/80 text-sm">Game Học Phân Số Siêu Hấp Dẫn</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 bg-white/25 rounded-full px-4 py-2 backdrop-blur-sm">
+                        <span class="text-yellow-300 text-xl">⭐</span>
+                        <span class="text-white font-bold text-lg" id="score">0</span>
+                    </div>
+                    <div class="flex items-center space-x-2 bg-white/25 rounded-full px-4 py-2 backdrop-blur-sm" id="streakContainer">
+                        <span class="text-orange-300 text-xl">🔥</span>
+                        <span class="text-white font-bold text-lg" id="streak">0</span>
+                    </div>
+                    <div class="flex items-center space-x-2 bg-white/25 rounded-full px-4 py-2 backdrop-blur-sm">
+                        <span class="text-red-300 text-xl">❤️</span>
+                        <span class="text-white font-bold text-lg" id="lives">3</span>
+                    </div>
+                    <div class="flex items-center space-x-2 bg-white/25 rounded-full px-4 py-2 backdrop-blur-sm">
+                        <span class="text-purple-300 text-xl">🏆</span>
+                        <span class="text-white font-bold">Cấp <span id="level">1</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-80 bg-white/15 backdrop-blur-md border-r border-white/20 p-6 hidden lg:block">
+            <div class="space-y-6">
+                <!-- Game Modes -->
+                <div class="bg-white/20 rounded-2xl p-4 backdrop-blur-sm">
+                    <h3 class="text-white font-bold text-lg mb-4 flex items-center">
+                        🎮 Chế Độ Chơi
+                    </h3>
+                    <div class="space-y-3">
+                        <button onclick="setGameMode('practice')" class="w-full bg-blue-500/80 hover:bg-blue-600/80 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105">
+                            📚 Luyện Tập
+                        </button>
+                        <button onclick="setGameMode('challenge')" class="w-full bg-orange-500/80 hover:bg-orange-600/80 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105">
+                            ⚡ Thử Thách
+                        </button>
+                        <button onclick="setGameMode('exam')" class="w-full bg-red-500/80 hover:bg-red-600/80 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105">
+                            🎯 Thi Đấu
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Exercise Types -->
+                <div class="bg-white/20 rounded-2xl p-4 backdrop-blur-sm">
+                    <h3 class="text-white font-bold text-lg mb-4 flex items-center">
+                        📝 Dạng Bài Tập
+                    </h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center text-white">
+                            <input type="checkbox" class="mr-3 rounded" checked id="basicOps">
+                            <span class="text-sm">Đặt tính cơ bản</span>
+                        </label>
+                        <label class="flex items-center text-white">
+                            <input type="checkbox" class="mr-3 rounded" id="findX">
+                            <span class="text-sm">Tìm x</span>
+                        </label>
+                        <label class="flex items-center text-white">
+                            <input type="checkbox" class="mr-3 rounded" id="complex">
+                            <span class="text-sm">Biểu thức phức tạp</span>
+                        </label>
+                        <label class="flex items-center text-white">
+                            <input type="checkbox" class="mr-3 rounded" id="convenient">
+                            <span class="text-sm">Tính thuận tiện</span>
+                        </label>
+                        <label class="flex items-center text-white">
+                            <input type="checkbox" class="mr-3 rounded" id="sorting">
+                            <span class="text-sm">Sắp xếp phân số</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Progress -->
+                <div class="bg-white/20 rounded-2xl p-4 backdrop-blur-sm">
+                    <h3 class="text-white font-bold text-lg mb-4">📊 Tiến Độ</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-white text-sm mb-1">
+                                <span>Cấp độ hiện tại</span>
+                                <span id="progressText">0/10</span>
+                            </div>
+                            <div class="bg-white/20 rounded-full h-3 overflow-hidden">
+                                <div class="progress-bar bg-gradient-to-r from-yellow-400 to-orange-500 h-full rounded-full" 
+                                     id="progressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="text-white/80 text-sm">
+                            <p>🎯 Độ chính xác: <span id="accuracy">100%</span></p>
+                            <p>⏱️ Thời gian TB: <span id="avgTime">0s</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="bg-white/20 rounded-2xl p-4 backdrop-blur-sm">
+                    <h3 class="text-white font-bold text-lg mb-4">🏆 Thành Tích</h3>
+                    <div class="grid grid-cols-3 gap-2" id="achievementsList">
+                        <div class="achievement-badge rounded-lg p-2 text-center text-2xl" title="Người mới bắt đầu">🌟</div>
+                        <div class="bg-gray-400/50 rounded-lg p-2 text-center text-2xl opacity-50" title="Chưa đạt được">🔥</div>
+                        <div class="bg-gray-400/50 rounded-lg p-2 text-center text-2xl opacity-50" title="Chưa đạt được">💎</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <!-- Game Area -->
+            <div class="max-w-4xl mx-auto">
+                <!-- Timer and Settings -->
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 text-white font-bold" id="timerDisplay" style="display: none;">
+                            ⏰ <span id="timer">60</span>s
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 text-white font-bold">
+                            📋 Câu <span id="questionNumber">1</span>/<span id="totalQuestions">10</span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="showSettings()" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-xl transition-all duration-300">
+                            ⚙️
+                        </button>
+                        <button onclick="showHelp()" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-xl transition-all duration-300">
+                            ❓
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question Card -->
+                <div class="bg-white rounded-3xl shadow-2xl p-8 card-hover bounce-in mb-6">
+                    <div class="text-center">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6" id="questionTitle">Tính kết quả phép tính sau:</h2>
+                        
+                        <!-- Question Area -->
+                        <div class="text-4xl font-bold text-gray-700 mb-8 min-h-[120px] flex items-center justify-center" id="questionArea">
+                            <!-- Dynamic question content will be inserted here -->
+                        </div>
+
+                        <!-- Answer Area -->
+                        <div id="answerArea" class="mb-6">
+                            <!-- Dynamic answer inputs will be inserted here -->
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex justify-center space-x-4 mb-6">
+                            <button onclick="checkAnswer()" 
+                                    class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                Kiểm tra 🎯
+                            </button>
+                            <button onclick="getHint()" 
+                                    class="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                Gợi ý 💡
+                            </button>
+                            <button onclick="nextQuestion()" 
+                                    class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                Tiếp theo ➡️
+                            </button>
+                        </div>
+
+                        <!-- Feedback Area -->
+                        <div id="feedback" class="text-center text-xl font-bold min-h-[60px] flex items-center justify-center"></div>
+                    </div>
+                </div>
+
+                <!-- Virtual Keyboard -->
+                <div id="virtualKeyboard" class="virtual-keyboard p-6 rounded-2xl mb-6" style="display: none;">
+                    <h3 class="text-gray-700 font-bold text-lg mb-4 text-center">🔢 Bàn Phím Ảo</h3>
+                    <div class="grid grid-cols-4 gap-3 max-w-md mx-auto">
+                        <button class="key-button rounded-xl py-3 px-4 font-bold text-gray-700" onclick="inputNumber('1')">1</button>
+                        <button class="key-button rounded-xl py-3 px-4 font-bold text-gray-700" onclick="inputNumber('2')">2</button>
+                        <button class="key-button rounded-xl py-3 px-4 font-bold text-gray-700" onclick="inputNumber('3')">3</button>
+                        <button class="key-button rounded-xl py-3 px-4 font-bold text-gray-700" onclick="clearInput()">⌫</button>
+                        <button class="key-button rounded-xl py-3 px-4 font-bold text-gray-700" onclick="inputNumber('4')">4</button>
+                        <button class="key-button rounded-xl py-3 px-4 font-bold text-gray-700" onclick="inputNumber('5')">5</button>
+                        <button class="key-button rounded-xl py-3 px-4 font-bold text-gray-700" onclick="inputNumber('6')">6</button>
+                        <button class="key-button rounded-xl py-3 px-4 font-bold text-gray-700" onclick="inputNumber('0')">0</button>
+                        <button class="key-button rounded-xl py-3 px-4 font-bold text-gray-700" onclick="inputNumber('7')">7</button>
+                        <button class="key-button rounded-xl py-3 px-4 font-bold text-gray-700" onclick="inputNumber('8')">8</button>
+                        <button class="key-button rounded-xl py-3 px-4 font-bold text-gray-700" onclick="inputNumber('9')">9</button>
+                        <button class="key-button rounded-xl py-3 px-4 font-bold text-gray-700" onclick="nextInput()">↓</button>
+                    </div>
+                </div>
+
+                <!-- Hint Area -->
+                <div id="hintArea" class="bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 p-6 rounded-2xl shadow-lg hidden">
+                    <div class="flex items-start">
+                        <div class="text-yellow-500 text-3xl mr-4 floating">💡</div>
+                        <div>
+                            <h4 class="font-bold text-yellow-800 mb-3 text-lg">Gợi ý chi tiết:</h4>
+                            <div id="hintText" class="text-yellow-700 space-y-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Achievement Modal -->
+    <div id="achievementModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-md mx-4 text-center bounce-in shadow-2xl">
+            <div class="text-8xl mb-4 star-rain" id="achievementIcon">🎉</div>
+            <h3 class="text-3xl font-black text-gray-800 mb-2" id="achievementTitle">Chúc mừng!</h3>
+            <p class="text-gray-600 mb-6 text-lg" id="achievementText">Bạn đã hoàn thành xuất sắc!</p>
+            <div class="flex justify-center space-x-3 mb-6">
+                <div class="text-4xl">⭐</div>
+                <div class="text-4xl">⭐</div>
+                <div class="text-4xl">⭐</div>
+            </div>
+            <button onclick="closeAchievement()" 
+                    class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-300 transform hover:scale-105">
+                Tiếp tục 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-lg mx-4 shadow-2xl">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">⚙️ Cài Đặt Game</h3>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">🎵 Âm thanh</label>
+                    <input type="range" min="0" max="100" value="50" class="w-full" id="volumeSlider">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">📊 Độ khó</label>
+                    <select class="w-full p-3 border rounded-xl" id="difficultySelect">
+                        <option value="easy">Dễ (1-5)</option>
+                        <option value="medium" selected>Trung bình (1-10)</option>
+                        <option value="hard">Khó (1-20)</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">🎯 Số câu hỏi</label>
+                    <input type="number" min="5" max="50" value="10" class="w-full p-3 border rounded-xl" id="questionCount">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">⏰ Thời gian (giây)</label>
+                    <input type="number" min="30" max="300" value="60" class="w-full p-3 border rounded-xl" id="timeLimit">
+                </div>
+            </div>
+            
+            <div class="flex justify-center space-x-4 mt-8">
+                <button onclick="saveSettings()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl">
+                    Lưu ✅
+                </button>
+                <button onclick="closeSettings()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl">
+                    Hủy ❌
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-2xl mx-4 shadow-2xl max-h-[80vh] overflow-y-auto">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">❓ Hướng Dẫn Chơi</h3>
+            
+            <div class="space-y-6">
+                <div class="bg-blue-50 p-4 rounded-xl">
+                    <h4 class="font-bold text-blue-800 mb-2">🎮 Cách chơi cơ bản:</h4>
+                    <ul class="text-blue-700 space-y-1 text-sm">
+                        <li>• Đọc đề bài và nhập đáp án vào ô trống</li>
+                        <li>• Nhấn "Kiểm tra" để xem kết quả</li>
+                        <li>• Sử dụng "Gợi ý" khi gặp khó khăn</li>
+                        <li>• Hoàn thành càng nhiều câu để lên cấp</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-green-50 p-4 rounded-xl">
+                    <h4 class="font-bold text-green-800 mb-2">🏆 Hệ thống điểm:</h4>
+                    <ul class="text-green-700 space-y-1 text-sm">
+                        <li>• Mỗi câu đúng: +10-50 điểm (tùy độ khó)</li>
+                        <li>• Combo liên tiếp: điểm nhân đôi</li>
+                        <li>• Hoàn thành nhanh: điểm thưởng</li>
+                        <li>• Lên cấp: mở khóa tính năng mới</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-yellow-50 p-4 rounded-xl">
+                    <h4 class="font-bold text-yellow-800 mb-2">⌨️ Phím tắt:</h4>
+                    <ul class="text-yellow-700 space-y-1 text-sm">
+                        <li>• Enter: Kiểm tra đáp án</li>
+                        <li>• H: Xem gợi ý</li>
+                        <li>• N: Câu tiếp theo</li>
+                        <li>• Space: Bàn phím ảo</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="text-center mt-8">
+                <button onclick="closeHelp()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl">
+                    Đã hiểu 👍
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-md mx-4 text-center shadow-2xl">
+            <div class="text-6xl mb-4" id="gameOverIcon">🎯</div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Kết thúc game!</h3>
+            <div class="bg-gray-50 rounded-xl p-4 mb-6">
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-gray-600">Điểm số:</p>
+                        <p class="font-bold text-xl" id="finalScore">0</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">Độ chính xác:</p>
+                        <p class="font-bold text-xl" id="finalAccuracy">0%</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">Cấp độ:</p>
+                        <p class="font-bold text-xl" id="finalLevel">1</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">Combo tốt nhất:</p>
+                        <p class="font-bold text-xl" id="bestStreak">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center space-x-4">
+                <button onclick="restartGame()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl">
+                    Chơi lại 🔄
+                </button>
+                <button onclick="closeGameOver()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl">
+                    Về menu 🏠
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            score: 0,
+            lives: 3,
+            level: 1,
+            streak: 0,
+            bestStreak: 0,
+            progress: 0,
+            questionsPerLevel: 10,
+            currentQuestion: 1,
+            totalQuestions: 10,
+            correctAnswers: 0,
+            totalAnswers: 0,
+            gameMode: 'practice',
+            questionType: 'basic',
+            difficulty: 'medium',
+            timeLimit: 60,
+            timeLeft: 60,
+            timer: null,
+            currentQuestionData: {},
+            activeInput: null,
+            settings: {
+                volume: 50,
+                difficulty: 'medium',
+                questionCount: 10,
+                timeLimit: 60
+            }
+        };
+
+        // Question Types
+        const questionTypes = {
+            basic: 'Đặt tính cơ bản',
+            findX: 'Tìm x',
+            complex: 'Biểu thức phức tạp',
+            convenient: 'Tính thuận tiện',
+            sorting: 'Sắp xếp phân số'
+        };
+
+        // Utility Functions
+        function gcd(a, b) {
+            return b === 0 ? Math.abs(a) : gcd(b, a % b);
+        }
+
+        function lcm(a, b) {
+            return Math.abs(a * b) / gcd(a, b);
+        }
+
+        function simplifyFraction(num, den) {
+            if (den === 0) return { numerator: 0, denominator: 1 };
+            
+            // Ensure positive numbers only
+            num = Math.abs(num);
+            den = Math.abs(den);
+            
+            const divisor = gcd(num, den);
+            let simplifiedNum = num / divisor;
+            let simplifiedDen = den / divisor;
+            
+            return {
+                numerator: simplifiedNum,
+                denominator: simplifiedDen
+            };
+        }
+
+        function addFractions(f1, f2) {
+            const num = f1.numerator * f2.denominator + f2.numerator * f1.denominator;
+            const den = f1.denominator * f2.denominator;
+            return simplifyFraction(num, den);
+        }
+
+        function subtractFractions(f1, f2) {
+            const num = f1.numerator * f2.denominator - f2.numerator * f1.denominator;
+            const den = f1.denominator * f2.denominator;
+            return simplifyFraction(num, den);
+        }
+
+        function multiplyFractions(f1, f2) {
+            const num = f1.numerator * f2.numerator;
+            const den = f1.denominator * f2.denominator;
+            return simplifyFraction(num, den);
+        }
+
+        function divideFractions(f1, f2) {
+            const num = f1.numerator * f2.denominator;
+            const den = f1.denominator * f2.numerator;
+            return simplifyFraction(num, den);
+        }
+
+        function generateFraction(maxNum = 10) {
+            const num = Math.floor(Math.random() * maxNum) + 1;
+            const den = Math.floor(Math.random() * maxNum) + 1;
+            return { numerator: num, denominator: den };
+        }
+
+        function compareFractions(f1, f2) {
+            const val1 = f1.numerator / f1.denominator;
+            const val2 = f2.numerator / f2.denominator;
+            return val1 - val2;
+        }
+
+        // Question Generators
+        function generateBasicQuestion() {
+            const maxNum = gameState.difficulty === 'easy' ? 5 : 
+                          gameState.difficulty === 'medium' ? 10 : 20;
+            
+            let fraction1 = generateFraction(maxNum);
+            let fraction2 = generateFraction(maxNum);
+            const operators = ['+', '-', '×', '÷'];
+            const operator = operators[Math.floor(Math.random() * operators.length)];
+
+            // For subtraction, ensure first fraction is larger to avoid negative results
+            if (operator === '-') {
+                const val1 = fraction1.numerator / fraction1.denominator;
+                const val2 = fraction2.numerator / fraction2.denominator;
+                
+                if (val1 < val2) {
+                    // Swap fractions to ensure positive result
+                    [fraction1, fraction2] = [fraction2, fraction1];
+                }
+            }
+
+            let answer;
+            switch (operator) {
+                case '+':
+                    answer = addFractions(fraction1, fraction2);
+                    break;
+                case '-':
+                    answer = subtractFractions(fraction1, fraction2);
+                    break;
+                case '×':
+                    answer = multiplyFractions(fraction1, fraction2);
+                    break;
+                case '÷':
+                    answer = divideFractions(fraction1, fraction2);
+                    break;
+            }
+
+            return {
+                type: 'basic',
+                fraction1,
+                fraction2,
+                operator,
+                answer,
+                question: `Tính kết quả phép tính sau:`,
+                hint: generateBasicHint(fraction1, fraction2, operator, answer)
+            };
+        }
+
+        function generateFindXQuestion() {
+            const maxNum = gameState.difficulty === 'easy' ? 5 : 
+                          gameState.difficulty === 'medium' ? 10 : 15;
+            
+            let knownFraction = generateFraction(maxNum);
+            let result = generateFraction(maxNum);
+            const operators = ['+', '-'];
+            const operator = operators[Math.floor(Math.random() * operators.length)];
+            
+            // For subtraction (x - known = result), ensure x > known to avoid negative x
+            if (operator === '-') {
+                // Make sure result + known gives a positive x
+                const tempX = addFractions(result, knownFraction);
+                // If we want x - known = result, then x = result + known
+                return {
+                    type: 'findX',
+                    knownFraction,
+                    result,
+                    operator,
+                    answer: tempX,
+                    question: `Tìm x trong phương trình:`,
+                    hint: generateFindXHint(knownFraction, result, operator, tempX)
+                };
+            } else {
+                // For addition (x + known = result), ensure result > known
+                const knownVal = knownFraction.numerator / knownFraction.denominator;
+                const resultVal = result.numerator / result.denominator;
+                
+                if (resultVal < knownVal) {
+                    // Swap to ensure positive answer
+                    [knownFraction, result] = [result, knownFraction];
+                }
+                
+                const answer = subtractFractions(result, knownFraction);
+                return {
+                    type: 'findX',
+                    knownFraction,
+                    result,
+                    operator,
+                    answer,
+                    question: `Tìm x trong phương trình:`,
+                    hint: generateFindXHint(knownFraction, result, operator, answer)
+                };
+            }
+        }
+
+        function generateComplexQuestion() {
+            const maxNum = gameState.difficulty === 'easy' ? 4 : 
+                          gameState.difficulty === 'medium' ? 8 : 12;
+            
+            let f1 = generateFraction(maxNum);
+            let f2 = generateFraction(maxNum);
+            let f3 = generateFraction(maxNum);
+            
+            const ops = ['+', '-'];
+            let op1 = ops[Math.floor(Math.random() * ops.length)];
+            let op2 = ops[Math.floor(Math.random() * ops.length)];
+            
+            // Ensure first operation doesn't create negative result
+            if (op1 === '-') {
+                const val1 = f1.numerator / f1.denominator;
+                const val2 = f2.numerator / f2.denominator;
+                if (val1 < val2) {
+                    [f1, f2] = [f2, f1];
+                }
+            }
+            
+            let temp = op1 === '+' ? addFractions(f1, f2) : subtractFractions(f1, f2);
+            
+            // Ensure second operation doesn't create negative result
+            if (op2 === '-') {
+                const tempVal = temp.numerator / temp.denominator;
+                const f3Val = f3.numerator / f3.denominator;
+                if (tempVal < f3Val) {
+                    // Change to addition instead
+                    op2 = '+';
+                }
+            }
+            
+            let answer = op2 === '+' ? addFractions(temp, f3) : subtractFractions(temp, f3);
+
+            return {
+                type: 'complex',
+                fractions: [f1, f2, f3],
+                operators: [op1, op2],
+                answer,
+                question: `Tính biểu thức phức tạp:`,
+                hint: generateComplexHint(f1, f2, f3, op1, op2, answer)
+            };
+        }
+
+        function generateSortingQuestion() {
+            const maxNum = gameState.difficulty === 'easy' ? 6 : 
+                          gameState.difficulty === 'medium' ? 10 : 15;
+            
+            const fractions = [];
+            for (let i = 0; i < 4; i++) {
+                fractions.push(generateFraction(maxNum));
+            }
+            
+            const sortedFractions = [...fractions].sort(compareFractions);
+            const isAscending = Math.random() > 0.5;
+            
+            if (!isAscending) {
+                sortedFractions.reverse();
+            }
+
+            return {
+                type: 'sorting',
+                fractions,
+                answer: sortedFractions,
+                isAscending,
+                question: `Sắp xếp các phân số theo thứ tự ${isAscending ? 'tăng' : 'giảm'} dần:`,
+                hint: generateSortingHint(fractions, sortedFractions, isAscending)
+            };
+        }
+
+        // Hint Generators
+        function generateBasicHint(f1, f2, operator, answer) {
+            let steps = [];
+            
+            if (operator === '+' || operator === '-') {
+                const commonDen = lcm(f1.denominator, f2.denominator);
+                const newNum1 = f1.numerator * (commonDen / f1.denominator);
+                const newNum2 = f2.numerator * (commonDen / f2.denominator);
+                
+                steps.push(`Bước 1: Quy đồng mẫu số`);
+                steps.push(`Mẫu số chung: ${commonDen}`);
+                steps.push(`${f1.numerator}/${f1.denominator} = ${newNum1}/${commonDen}`);
+                steps.push(`${f2.numerator}/${f2.denominator} = ${newNum2}/${commonDen}`);
+                
+                if (operator === '+') {
+                    steps.push(`Bước 2: Cộng tử số: ${newNum1} + ${newNum2} = ${newNum1 + newNum2}`);
+                } else {
+                    steps.push(`Bước 2: Trừ tử số: ${newNum1} - ${newNum2} = ${newNum1 - newNum2}`);
+                }
+                
+                steps.push(`Bước 3: Rút gọn phân số (nếu cần)`);
+                steps.push(`Kết quả: ${answer.numerator}/${answer.denominator}`);
+            } else if (operator === '×') {
+                steps.push(`Bước 1: Nhân tử số với tử số, mẫu số với mẫu số`);
+                steps.push(`${f1.numerator} × ${f2.numerator} = ${f1.numerator * f2.numerator}`);
+                steps.push(`${f1.denominator} × ${f2.denominator} = ${f1.denominator * f2.denominator}`);
+                steps.push(`Bước 2: Rút gọn phân số`);
+                steps.push(`Kết quả: ${answer.numerator}/${answer.denominator}`);
+            } else if (operator === '÷') {
+                steps.push(`Bước 1: Chia phân số = nhân với phân số nghịch đảo`);
+                steps.push(`${f1.numerator}/${f1.denominator} ÷ ${f2.numerator}/${f2.denominator} = ${f1.numerator}/${f1.denominator} × ${f2.denominator}/${f2.numerator}`);
+                steps.push(`Bước 2: Nhân tử số với tử số, mẫu số với mẫu số`);
+                steps.push(`${f1.numerator} × ${f2.denominator} = ${f1.numerator * f2.denominator}`);
+                steps.push(`${f1.denominator} × ${f2.numerator} = ${f1.denominator * f2.numerator}`);
+                steps.push(`Bước 3: Rút gọn phân số`);
+                steps.push(`Kết quả: ${answer.numerator}/${answer.denominator}`);
+            }
+            
+            return steps;
+        }
+
+        function generateFindXHint(known, result, operator, answer) {
+            let steps = [];
+            
+            steps.push(`Phương trình: x ${operator} ${known.numerator}/${known.denominator} = ${result.numerator}/${result.denominator}`);
+            
+            if (operator === '+') {
+                steps.push(`Để tìm x, ta lấy kết quả trừ đi phân số đã biết:`);
+                steps.push(`x = ${result.numerator}/${result.denominator} - ${known.numerator}/${known.denominator}`);
+            } else {
+                steps.push(`Để tìm x, ta lấy kết quả cộng với phân số đã biết:`);
+                steps.push(`x = ${result.numerator}/${result.denominator} + ${known.numerator}/${known.denominator}`);
+            }
+            
+            steps.push(`Quy đồng và tính toán...`);
+            steps.push(`x = ${answer.numerator}/${answer.denominator}`);
+            
+            return steps;
+        }
+
+        function generateComplexHint(f1, f2, f3, op1, op2, answer) {
+            let steps = [];
+            
+            steps.push(`Biểu thức: ${f1.numerator}/${f1.denominator} ${op1} ${f2.numerator}/${f2.denominator} ${op2} ${f3.numerator}/${f3.denominator}`);
+            steps.push(`Bước 1: Tính từ trái sang phải`);
+            
+            let temp = op1 === '+' ? addFractions(f1, f2) : subtractFractions(f1, f2);
+            steps.push(`${f1.numerator}/${f1.denominator} ${op1} ${f2.numerator}/${f2.denominator} = ${temp.numerator}/${temp.denominator}`);
+            
+            steps.push(`Bước 2: Tiếp tục tính`);
+            steps.push(`${temp.numerator}/${temp.denominator} ${op2} ${f3.numerator}/${f3.denominator} = ${answer.numerator}/${answer.denominator}`);
+            
+            return steps;
+        }
+
+        function generateSortingHint(fractions, sorted, isAscending) {
+            let steps = [];
+            
+            steps.push(`Để so sánh phân số, ta có thể:`);
+            steps.push(`1. Quy đồng mẫu số tất cả phân số`);
+            steps.push(`2. Hoặc chuyển thành số thập phân`);
+            steps.push(`3. So sánh và sắp xếp`);
+            
+            steps.push(`Các phân số theo giá trị:`);
+            fractions.forEach((f, i) => {
+                const decimal = (f.numerator / f.denominator).toFixed(3);
+                steps.push(`${f.numerator}/${f.denominator} = ${decimal}`);
+            });
+            
+            steps.push(`Thứ tự ${isAscending ? 'tăng' : 'giảm'} dần:`);
+            sorted.forEach(f => {
+                steps.push(`${f.numerator}/${f.denominator}`);
+            });
+            
+            return steps;
+        }
+
+        // Question Generation
+        function generateQuestion() {
+            const enabledTypes = [];
+            if (document.getElementById('basicOps').checked) enabledTypes.push('basic');
+            if (document.getElementById('findX').checked) enabledTypes.push('findX');
+            if (document.getElementById('complex').checked) enabledTypes.push('complex');
+            if (document.getElementById('convenient').checked) enabledTypes.push('basic'); // Use basic for now
+            if (document.getElementById('sorting').checked) enabledTypes.push('sorting');
+            
+            if (enabledTypes.length === 0) enabledTypes.push('basic');
+            
+            const questionType = enabledTypes[Math.floor(Math.random() * enabledTypes.length)];
+            
+            let questionData;
+            switch (questionType) {
+                case 'basic':
+                    questionData = generateBasicQuestion();
+                    break;
+                case 'findX':
+                    questionData = generateFindXQuestion();
+                    break;
+                case 'complex':
+                    questionData = generateComplexQuestion();
+                    break;
+                case 'sorting':
+                    questionData = generateSortingQuestion();
+                    break;
+                default:
+                    questionData = generateBasicQuestion();
+            }
+            
+            gameState.currentQuestionData = questionData;
+            displayQuestion(questionData);
+        }
+
+        // Display Functions
+        function displayQuestion(data) {
+            const questionArea = document.getElementById('questionArea');
+            const answerArea = document.getElementById('answerArea');
+            const questionTitle = document.getElementById('questionTitle');
+            
+            questionTitle.textContent = data.question;
+            
+            if (data.type === 'basic') {
+                questionArea.innerHTML = `
+                    <div class="flex items-center justify-center space-x-4">
+                        <div class="fraction">
+                            <div class="numerator">${data.fraction1.numerator}</div>
+                            <div class="denominator">${data.fraction1.denominator}</div>
+                        </div>
+                        <span class="text-5xl font-black">${data.operator}</span>
+                        <div class="fraction">
+                            <div class="numerator">${data.fraction2.numerator}</div>
+                            <div class="denominator">${data.fraction2.denominator}</div>
+                        </div>
+                        <span class="text-5xl font-black">=</span>
+                        <span class="text-5xl font-black text-blue-600">?</span>
+                    </div>
+                `;
+                
+                answerArea.innerHTML = `
+                    <div class="flex items-center justify-center space-x-2">
+                        <span class="text-2xl font-bold text-gray-600">Đáp án:</span>
+                        <div class="fraction">
+                            <input type="number" class="answer-input" id="answerNum" placeholder="?" onfocus="setActiveInput(this)">
+                            <input type="number" class="answer-input" id="answerDen" placeholder="?" onfocus="setActiveInput(this)">
+                        </div>
+                    </div>
+                `;
+            } else if (data.type === 'findX') {
+                questionArea.innerHTML = `
+                    <div class="flex items-center justify-center space-x-4">
+                        <span class="text-5xl font-black text-red-600">x</span>
+                        <span class="text-5xl font-black">${data.operator}</span>
+                        <div class="fraction">
+                            <div class="numerator">${data.knownFraction.numerator}</div>
+                            <div class="denominator">${data.knownFraction.denominator}</div>
+                        </div>
+                        <span class="text-5xl font-black">=</span>
+                        <div class="fraction">
+                            <div class="numerator">${data.result.numerator}</div>
+                            <div class="denominator">${data.result.denominator}</div>
+                        </div>
+                    </div>
+                `;
+                
+                answerArea.innerHTML = `
+                    <div class="flex items-center justify-center space-x-2">
+                        <span class="text-2xl font-bold text-gray-600">x =</span>
+                        <div class="fraction">
+                            <input type="number" class="answer-input" id="answerNum" placeholder="?" onfocus="setActiveInput(this)">
+                            <input type="number" class="answer-input" id="answerDen" placeholder="?" onfocus="setActiveInput(this)">
+                        </div>
+                    </div>
+                `;
+            } else if (data.type === 'complex') {
+                const f = data.fractions;
+                const ops = data.operators;
+                
+                questionArea.innerHTML = `
+                    <div class="flex items-center justify-center space-x-3 flex-wrap">
+                        <div class="fraction">
+                            <div class="numerator">${f[0].numerator}</div>
+                            <div class="denominator">${f[0].denominator}</div>
+                        </div>
+                        <span class="text-4xl font-black">${ops[0]}</span>
+                        <div class="fraction">
+                            <div class="numerator">${f[1].numerator}</div>
+                            <div class="denominator">${f[1].denominator}</div>
+                        </div>
+                        <span class="text-4xl font-black">${ops[1]}</span>
+                        <div class="fraction">
+                            <div class="numerator">${f[2].numerator}</div>
+                            <div class="denominator">${f[2].denominator}</div>
+                        </div>
+                        <span class="text-4xl font-black">=</span>
+                        <span class="text-4xl font-black text-blue-600">?</span>
+                    </div>
+                `;
+                
+                answerArea.innerHTML = `
+                    <div class="flex items-center justify-center space-x-2">
+                        <span class="text-2xl font-bold text-gray-600">Kết quả:</span>
+                        <div class="fraction">
+                            <input type="number" class="answer-input" id="answerNum" placeholder="?" onfocus="setActiveInput(this)">
+                            <input type="number" class="answer-input" id="answerDen" placeholder="?" onfocus="setActiveInput(this)">
+                        </div>
+                    </div>
+                `;
+            } else if (data.type === 'sorting') {
+                const fractionsHtml = data.fractions.map((f, i) => `
+                    <div class="sortable-item bg-blue-100 border-2 border-blue-300 rounded-xl p-4 cursor-move" 
+                         draggable="true" data-index="${i}" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+                        <div class="fraction text-center">
+                            <div class="numerator text-2xl">${f.numerator}</div>
+                            <div class="denominator text-2xl">${f.denominator}</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                questionArea.innerHTML = `
+                    <div class="space-y-4">
+                        <p class="text-lg text-gray-600">Kéo thả để sắp xếp:</p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="sortableContainer" 
+                             ondragover="allowDrop(event)" ondrop="drop(event)">
+                            ${fractionsHtml}
+                        </div>
+                    </div>
+                `;
+                
+                answerArea.innerHTML = `
+                    <button onclick="checkSortingAnswer()" 
+                            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl">
+                        Kiểm tra thứ tự 📋
+                    </button>
+                `;
+            }
+            
+            // Clear feedback and hints
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('hintArea').classList.add('hidden');
+            
+            // Focus first input
+            setTimeout(() => {
+                const firstInput = document.getElementById('answerNum');
+                if (firstInput) {
+                    firstInput.focus();
+                    setActiveInput(firstInput);
+                }
+            }, 100);
+        }
+
+        // Input Functions
+        function setActiveInput(input) {
+            gameState.activeInput = input;
+            // Show virtual keyboard for touch devices
+            if ('ontouchstart' in window) {
+                document.getElementById('virtualKeyboard').style.display = 'block';
+            }
+        }
+
+        function inputNumber(num) {
+            if (gameState.activeInput) {
+                gameState.activeInput.value += num;
+            }
+        }
+
+        function clearInput() {
+            if (gameState.activeInput) {
+                gameState.activeInput.value = gameState.activeInput.value.slice(0, -1);
+            }
+        }
+
+        function nextInput() {
+            if (gameState.activeInput && gameState.activeInput.id === 'answerNum') {
+                const denomInput = document.getElementById('answerDen');
+                if (denomInput) {
+                    denomInput.focus();
+                    setActiveInput(denomInput);
+                }
+            }
+        }
+
+        // Drag and Drop for Sorting
+        let draggedElement = null;
+
+        function dragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+        }
+
+        function dragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        function allowDrop(e) {
+            e.preventDefault();
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            if (draggedElement && e.target !== draggedElement) {
+                const container = document.getElementById('sortableContainer');
+                const afterElement = getDragAfterElement(container, e.clientY);
+                
+                if (afterElement == null) {
+                    container.appendChild(draggedElement);
+                } else {
+                    container.insertBefore(draggedElement, afterElement);
+                }
+            }
+        }
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.sortable-item:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // Answer Checking
+        function checkAnswer() {
+            const data = gameState.currentQuestionData;
+            
+            if (data.type === 'sorting') {
+                checkSortingAnswer();
+                return;
+            }
+            
+            const userNum = parseInt(document.getElementById('answerNum').value);
+            const userDen = parseInt(document.getElementById('answerDen').value);
+            
+            if (isNaN(userNum) || isNaN(userDen) || userDen === 0) {
+                showFeedback('Vui lòng nhập đầy đủ tử số và mẫu số hợp lệ! 📝', 'warning');
+                playSound('error');
+                return;
+            }
+            
+            if (userNum < 0 || userDen < 0) {
+                showFeedback('Chỉ được nhập số dương! Không có số âm trong game này 😊', 'warning');
+                playSound('error');
+                return;
+            }
+
+            const userAnswer = simplifyFraction(userNum, userDen);
+            const correctAnswer = data.answer;
+
+            gameState.totalAnswers++;
+
+            if (userAnswer.numerator === correctAnswer.numerator && 
+                userAnswer.denominator === correctAnswer.denominator) {
+                handleCorrectAnswer();
+            } else {
+                handleWrongAnswer(correctAnswer);
+            }
+        }
+
+        function checkSortingAnswer() {
+            const container = document.getElementById('sortableContainer');
+            const sortedElements = [...container.children];
+            const userOrder = sortedElements.map(el => parseInt(el.dataset.index));
+            
+            const data = gameState.currentQuestionData;
+            const correctOrder = data.answer.map(f => 
+                data.fractions.findIndex(original => 
+                    original.numerator === f.numerator && original.denominator === f.denominator
+                )
+            );
+            
+            gameState.totalAnswers++;
+            
+            if (JSON.stringify(userOrder) === JSON.stringify(correctOrder)) {
+                handleCorrectAnswer();
+            } else {
+                handleWrongAnswer(null, 'Thứ tự sắp xếp chưa đúng! Hãy thử lại 🔄');
+            }
+        }
+
+        function handleCorrectAnswer() {
+            gameState.correctAnswers++;
+            gameState.streak++;
+            gameState.bestStreak = Math.max(gameState.bestStreak, gameState.streak);
+            
+            const basePoints = 10 * gameState.level;
+            const streakBonus = Math.min(gameState.streak * 5, 50);
+            const timeBonus = gameState.gameMode === 'challenge' ? Math.max(0, gameState.timeLeft) : 0;
+            const totalPoints = basePoints + streakBonus + timeBonus;
+            
+            gameState.score += totalPoints;
+            gameState.progress++;
+            
+            showFeedback(`🎉 Chính xác! +${totalPoints} điểm (Combo: ${gameState.streak})`, 'success');
+            playSound('success');
+            createStarEffect();
+            
+            updateUI();
+            
+            if (gameState.progress >= gameState.questionsPerLevel) {
+                levelUp();
+            } else if (gameState.currentQuestion >= gameState.totalQuestions) {
+                endGame();
+            } else {
+                setTimeout(() => {
+                    nextQuestion();
+                }, 2000);
+            }
+        }
+
+        function handleWrongAnswer(correctAnswer, customMessage = null) {
+            gameState.lives--;
+            gameState.streak = 0;
+            
+            let message = customMessage;
+            if (!message && correctAnswer) {
+                message = `❌ Sai rồi! Đáp án đúng là ${correctAnswer.numerator}/${correctAnswer.denominator}`;
+            }
+            
+            showFeedback(message, 'error');
+            playSound('error');
+            
+            updateUI();
+            
+            if (gameState.lives <= 0) {
+                setTimeout(() => {
+                    endGame();
+                }, 2000);
+            }
+        }
+
+        // Feedback and Effects
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = message;
+            
+            feedback.className = 'text-center text-xl font-bold min-h-[60px] flex items-center justify-center ';
+            
+            if (type === 'success') {
+                feedback.className += 'text-green-600 pulse-success';
+            } else if (type === 'error') {
+                feedback.className += 'text-red-600 shake';
+            } else {
+                feedback.className += 'text-yellow-600';
+            }
+        }
+
+        function createStarEffect() {
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const star = document.createElement('div');
+                    star.innerHTML = '⭐';
+                    star.className = 'fixed text-4xl star-rain pointer-events-none z-50';
+                    star.style.left = Math.random() * window.innerWidth + 'px';
+                    star.style.top = '0px';
+                    document.body.appendChild(star);
+                    
+                    setTimeout(() => {
+                        star.remove();
+                    }, 2000);
+                }, i * 200);
+            }
+        }
+
+        function playSound(type) {
+            // Sound effects would be implemented here
+            // For now, we'll use visual feedback
+            if (type === 'success') {
+                navigator.vibrate && navigator.vibrate([100, 50, 100]);
+            } else if (type === 'error') {
+                navigator.vibrate && navigator.vibrate([200]);
+            }
+        }
+
+        // Game Flow
+        function nextQuestion() {
+            if (gameState.currentQuestion < gameState.totalQuestions) {
+                gameState.currentQuestion++;
+                generateQuestion();
+                updateUI();
+            } else {
+                endGame();
+            }
+        }
+
+        function levelUp() {
+            gameState.level++;
+            gameState.progress = 0;
+            gameState.lives = Math.min(gameState.lives + 1, 5);
+            
+            showAchievement('🎊', 'Lên cấp!', `Chúc mừng! Bạn đã lên cấp ${gameState.level}!`);
+            playSound('levelup');
+            updateAchievements();
+        }
+
+        function endGame() {
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+                gameState.timer = null;
+            }
+            
+            const accuracy = gameState.totalAnswers > 0 ? 
+                Math.round((gameState.correctAnswers / gameState.totalAnswers) * 100) : 0;
+            
+            document.getElementById('finalScore').textContent = gameState.score;
+            document.getElementById('finalAccuracy').textContent = accuracy + '%';
+            document.getElementById('finalLevel').textContent = gameState.level;
+            document.getElementById('bestStreak').textContent = gameState.bestStreak;
+            
+            if (accuracy >= 80) {
+                document.getElementById('gameOverIcon').textContent = '🏆';
+            } else if (accuracy >= 60) {
+                document.getElementById('gameOverIcon').textContent = '🎯';
+            } else {
+                document.getElementById('gameOverIcon').textContent = '📚';
+            }
+            
+            showModal('gameOverModal');
+            saveProgress();
+        }
+
+        // Hint System
+        function getHint() {
+            const data = gameState.currentQuestionData;
+            const hintText = document.getElementById('hintText');
+            
+            if (data.hint && data.hint.length > 0) {
+                hintText.innerHTML = data.hint.map(step => `<p class="mb-2">• ${step}</p>`).join('');
+                document.getElementById('hintArea').classList.remove('hidden');
+                
+                // Deduct small penalty for using hint
+                gameState.score = Math.max(0, gameState.score - 5);
+                updateUI();
+            }
+        }
+
+        // UI Updates
+        function updateUI() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('lives').textContent = gameState.lives;
+            document.getElementById('level').textContent = gameState.level;
+            document.getElementById('streak').textContent = gameState.streak;
+            document.getElementById('questionNumber').textContent = gameState.currentQuestion;
+            document.getElementById('totalQuestions').textContent = gameState.totalQuestions;
+            document.getElementById('progressText').textContent = `${gameState.progress}/${gameState.questionsPerLevel}`;
+            
+            const progressPercent = (gameState.progress / gameState.questionsPerLevel) * 100;
+            document.getElementById('progressBar').style.width = progressPercent + '%';
+            
+            const accuracy = gameState.totalAnswers > 0 ? 
+                Math.round((gameState.correctAnswers / gameState.totalAnswers) * 100) : 100;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            
+            // Update streak glow effect
+            const streakContainer = document.getElementById('streakContainer');
+            if (gameState.streak >= 5) {
+                streakContainer.classList.add('streak-glow');
+            } else {
+                streakContainer.classList.remove('streak-glow');
+            }
+        }
+
+        // Game Modes
+        function setGameMode(mode) {
+            gameState.gameMode = mode;
+            
+            switch (mode) {
+                case 'practice':
+                    gameState.totalQuestions = 10;
+                    gameState.timeLimit = 0; // No time limit
+                    document.getElementById('timerDisplay').style.display = 'none';
+                    break;
+                case 'challenge':
+                    gameState.totalQuestions = 15;
+                    gameState.timeLimit = 120;
+                    startTimer();
+                    break;
+                case 'exam':
+                    gameState.totalQuestions = 20;
+                    gameState.timeLimit = 300;
+                    startTimer();
+                    break;
+            }
+            
+            resetGame();
+            generateQuestion();
+        }
+
+        function startTimer() {
+            gameState.timeLeft = gameState.timeLimit;
+            document.getElementById('timerDisplay').style.display = 'block';
+            document.getElementById('timer').textContent = gameState.timeLeft;
+            
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                document.getElementById('timer').textContent = gameState.timeLeft;
+                
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timer);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // Modal Functions
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+            document.getElementById(modalId).classList.add('flex');
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.getElementById(modalId).classList.remove('flex');
+        }
+
+        function showAchievement(icon, title, text) {
+            document.getElementById('achievementIcon').textContent = icon;
+            document.getElementById('achievementTitle').textContent = title;
+            document.getElementById('achievementText').textContent = text;
+            showModal('achievementModal');
+        }
+
+        function closeAchievement() {
+            hideModal('achievementModal');
+            if (gameState.progress < gameState.questionsPerLevel && gameState.currentQuestion < gameState.totalQuestions) {
+                setTimeout(() => {
+                    nextQuestion();
+                }, 500);
+            }
+        }
+
+        function showSettings() {
+            document.getElementById('volumeSlider').value = gameState.settings.volume;
+            document.getElementById('difficultySelect').value = gameState.settings.difficulty;
+            document.getElementById('questionCount').value = gameState.settings.questionCount;
+            document.getElementById('timeLimit').value = gameState.settings.timeLimit;
+            showModal('settingsModal');
+        }
+
+        function closeSettings() {
+            hideModal('settingsModal');
+        }
+
+        function saveSettings() {
+            gameState.settings.volume = document.getElementById('volumeSlider').value;
+            gameState.settings.difficulty = document.getElementById('difficultySelect').value;
+            gameState.settings.questionCount = document.getElementById('questionCount').value;
+            gameState.settings.timeLimit = document.getElementById('timeLimit').value;
+            
+            gameState.difficulty = gameState.settings.difficulty;
+            gameState.totalQuestions = parseInt(gameState.settings.questionCount);
+            
+            localStorage.setItem('mathHeroSettings', JSON.stringify(gameState.settings));
+            
+            closeSettings();
+        }
+
+        function showHelp() {
+            showModal('helpModal');
+        }
+
+        function closeHelp() {
+            hideModal('helpModal');
+        }
+
+        function closeGameOver() {
+            hideModal('gameOverModal');
+        }
+
+        function restartGame() {
+            hideModal('gameOverModal');
+            resetGame();
+            generateQuestion();
+        }
+
+        // Achievement System
+        function updateAchievements() {
+            const achievements = document.getElementById('achievementsList');
+            // This would be expanded with a full achievement system
+            
+            if (gameState.level >= 2) {
+                achievements.children[1].classList.remove('opacity-50', 'bg-gray-400/50');
+                achievements.children[1].classList.add('achievement-badge');
+            }
+            
+            if (gameState.level >= 5) {
+                achievements.children[2].classList.remove('opacity-50', 'bg-gray-400/50');
+                achievements.children[2].classList.add('achievement-badge');
+            }
+        }
+
+        // Data Persistence
+        function saveProgress() {
+            const progress = {
+                bestScore: Math.max(gameState.score, localStorage.getItem('mathHeroBestScore') || 0),
+                bestLevel: Math.max(gameState.level, localStorage.getItem('mathHeroBestLevel') || 1),
+                bestStreak: Math.max(gameState.bestStreak, localStorage.getItem('mathHeroBestStreak') || 0),
+                totalGames: (parseInt(localStorage.getItem('mathHeroTotalGames')) || 0) + 1
+            };
+            
+            Object.keys(progress).forEach(key => {
+                localStorage.setItem('mathHero' + key.charAt(0).toUpperCase() + key.slice(1), progress[key]);
+            });
+        }
+
+        function loadProgress() {
+            const settings = localStorage.getItem('mathHeroSettings');
+            if (settings) {
+                gameState.settings = JSON.parse(settings);
+                gameState.difficulty = gameState.settings.difficulty;
+            }
+        }
+
+        // Game Reset
+        function resetGame() {
+            gameState.score = 0;
+            gameState.lives = 3;
+            gameState.streak = 0;
+            gameState.progress = 0;
+            gameState.currentQuestion = 1;
+            gameState.correctAnswers = 0;
+            gameState.totalAnswers = 0;
+            
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+                gameState.timer = null;
+            }
+            
+            updateUI();
+        }
+
+        // Keyboard Support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                checkAnswer();
+            } else if (e.key === 'h' || e.key === 'H') {
+                e.preventDefault();
+                getHint();
+            } else if (e.key === 'n' || e.key === 'N') {
+                e.preventDefault();
+                nextQuestion();
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                const keyboard = document.getElementById('virtualKeyboard');
+                keyboard.style.display = keyboard.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+
+        // Initialize Game
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProgress();
+            resetGame();
+            generateQuestion();
+            updateUI();
+            
+            // Show welcome message
+            setTimeout(() => {
+                showAchievement('🎮', 'Chào mừng đến Math Hero!', 'Hãy bắt đầu hành trình học phân số thú vị!');
+            }, 1000);
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97016f5852d484cd',t:'MTc1NTM1MjU4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
